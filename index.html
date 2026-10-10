@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Coding Assistant - Academic Final-Semester Project</title>
+    <meta name="description" content="A developer workspace and academic final-semester project for generating, explaining, debugging, and improving code using AI." />
+    <meta property="og:title" content="AI Coding Assistant" />
+    <meta property="og:description" content="A developer workspace and academic final-semester project for generating, explaining, debugging, and improving code using AI." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Bootstrap 5 & Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Project Stylesheets -->
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/components.css" />
+  </head>
+  <body>
+    <!-- Top Navigation -->
+    <header class="app-topbar border-bottom">
+      <div class="topbar-left">
+        <a href="index.html" class="brand-link">
+          <div class="brand-logo-icon"><i class="bi bi-cpu"></i></div>
+          <span>AI Coding Assistant</span>
+        </a>
+      </div>
+      <div class="topbar-right">
+        <a href="dashboard.html" class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex align-items-center gap-1">
+          <i class="bi bi-grid-1x2"></i> Dashboard
+        </a>
+        <a href="workspace.html" class="btn-primary-action btn-sm">
+          <i class="bi bi-terminal"></i> Launch Workspace
+        </a>
+        <button id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Toggle theme">
+          <i class="bi bi-sun"></i>
+        </button>
+        <a href="login.html" class="btn btn-sm btn-outline-primary">
+          <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
+        </a>
+      </div>
+    </header>
+
+    <!-- Main Presentation Hero -->
+    <main class="content-container py-5">
+      <!-- Project Banner Split -->
+      <div class="row align-items-center g-5 mb-5">
+        <div class="col-lg-6">
+          <div class="d-inline-flex align-items-center gap-2 px-3 py-1 mb-3 rounded-pill" style="background: var(--accent-subtle); color: var(--accent-text); border: 1px solid rgba(99,102,241,0.2); font-size: 0.8rem; font-weight: 600;">
+            <i class="bi bi-mortarboard-fill"></i> Final-Semester Capstone Project · Computer Science & Engineering
+          </div>
+          <h1 class="display-5 fw-bold mb-3 text-balance" style="letter-spacing: -0.03em;">
+            AI-Powered Developer Workspace for Next-Gen Code Engineering
+          </h1>
+          <p class="lead text-secondary mb-4" style="font-size: 1.05rem; line-height: 1.7;">
+            A purpose-built, full-featured developer platform designed to generate clean source code, explain intricate algorithms, detect and resolve runtime bugs, and optimize software architecture across six core programming languages.
+          </p>
+
+          <div class="d-flex flex-wrap gap-3 mb-4">
+            <a href="workspace.html" class="btn-primary-action px-4 py-2 text-decoration-none">
+              <i class="bi bi-code-square me-1"></i> Open Coding Workspace
+            </a>
+            <a href="dashboard.html" class="btn btn-outline-secondary px-4 py-2" style="background: var(--bg-surface); border-color: var(--border-color); color: var(--text-primary);">
+              <i class="bi bi-speedometer2 me-1"></i> Project Dashboard
+            </a>
+            <a href="login.html" class="btn btn-link text-decoration-none text-secondary">
+              <i class="bi bi-person-check me-1"></i> Demo Login
+            </a>
+          </div>
+
+          <!-- Quick Architectural Highlights -->
+          <div class="row g-3 pt-3 border-top" style="border-color: var(--border-color) !important;">
+            <div class="col-4">
+              <div class="fw-bold fs-5 text-tabular text-primary">6 Languages</div>
+              <div class="small text-muted">Python, JS, Java, C, C++, SQL</div>
+            </div>
+            <div class="col-4">
+              <div class="fw-bold fs-5 text-tabular text-primary">4 Core Tasks</div>
+              <div class="small text-muted">Generate, Explain, Debug, Improve</div>
+            </div>
+            <div class="col-4">
+              <div class="fw-bold fs-5 text-tabular text-primary">REST JSON</div>
+              <div class="small text-muted">Python Flask Backend Engine</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="saas-card p-2 position-relative overflow-hidden" style="border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);">
+            <img 
+              src="/src/assets/images/project_hero_banner_1791557986590.jpg" 
+              alt="AI Coding Assistant Workspace Preview" 
+              class="img-fluid rounded-3 w-100" 
+              style="object-fit: cover; max-height: 420px;"
+              referrerpolicy="no-referrer"
+            />
+            <div class="p-3 d-flex align-items-center justify-content-between" style="background: var(--bg-surface);">
+              <div class="d-flex align-items-center gap-2">
+                <span class="status-indicator-dot online"></span>
+                <span class="small fw-semibold">Demonstration Mode Ready</span>
+              </div>
+              <span class="small font-mono text-muted">Monaco Editor v0.45</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Viva Examiner Feature Matrix -->
+      <section class="mb-5">
+        <div class="text-center max-w-2xl mx-auto mb-4">
+          <h2 class="section-title fs-3">Core Modules Evaluated for Viva Examination</h2>
+          <p class="section-desc">Each module provides targeted tooling designed specifically for academic review and production workflows.</p>
+        </div>
+
+        <div class="row g-4">
+          <!-- Card 1: Generate -->
+          <div class="col-md-6 col-lg-3">
+            <div class="saas-card h-100 d-flex flex-column">
+              <div class="quick-action-icon generate"><i class="bi bi-magic"></i></div>
+              <h3 class="fs-6 fw-bold mb-2">Code Generator</h3>
+              <p class="small text-muted mb-3 flex-grow-1">Translates natural-language business specifications into idiomatic, typed code with edge case safeguards and test cases.</p>
+              <a href="workspace.html?task=generate" class="btn btn-sm btn-outline-primary mt-auto text-decoration-none">
+                Launch Generator <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Card 2: Explain -->
+          <div class="col-md-6 col-lg-3">
+            <div class="saas-card h-100 d-flex flex-column">
+              <div class="quick-action-icon explain"><i class="bi bi-journal-code"></i></div>
+              <h3 class="fs-6 fw-bold mb-2">Code Explainer</h3>
+              <p class="small text-muted mb-3 flex-grow-1">Analyzes algorithm step-by-step, identifies critical variable roles, and calculates Big-O time and space complexity.</p>
+              <a href="workspace.html?task=explain" class="btn btn-sm btn-outline-info mt-auto text-decoration-none">
+                Launch Explainer <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Card 3: Debug -->
+          <div class="col-md-6 col-lg-3">
+            <div class="saas-card h-100 d-flex flex-column">
+              <div class="quick-action-icon debug"><i class="bi bi-bug"></i></div>
+              <h3 class="fs-6 fw-bold mb-2">Debugging Assistant</h3>
+              <p class="small text-muted mb-3 flex-grow-1">Pinpoints exact syntax errors, runtime exceptions, off-by-one bounds, and produces verified corrected code blocks.</p>
+              <a href="workspace.html?task=debug" class="btn btn-sm btn-outline-danger mt-auto text-decoration-none">
+                Launch Debugger <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+
+          <!-- Card 4: Improve -->
+          <div class="col-md-6 col-lg-3">
+            <div class="saas-card h-100 d-flex flex-column">
+              <div class="quick-action-icon improve"><i class="bi bi-lightning-charge"></i></div>
+              <h3 class="fs-6 fw-bold mb-2">Code Improvement</h3>
+              <p class="small text-muted mb-3 flex-grow-1">Refactors code for clean architecture, readability, computational efficiency, and maintainable design patterns.</p>
+              <a href="workspace.html?task=improve" class="btn btn-sm btn-outline-success mt-auto text-decoration-none">
+                Launch Optimizer <i class="bi bi-arrow-right ms-1"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Complete Project Pages Directory -->
+      <section class="saas-card p-4 mb-5">
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-color) !important;">
+          <div>
+            <h2 class="fs-5 fw-bold mb-1">Project Demonstration Sitemap</h2>
+            <p class="small text-muted mb-0">Direct access to all 10 project pages built for external examiner review.</p>
+          </div>
+          <span class="badge bg-secondary-subtle text-secondary border">Academic Multi-Page Architecture</span>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <a href="workspace.html" class="saas-card saas-card-interactive p-3">
+              <div class="fw-semibold text-primary"><i class="bi bi-terminal me-2"></i>1. AI Workspace</div>
+              <div class="small text-muted">Primary split-pane coding ide</div>
+            </a>
+          </div>
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <a href="dashboard.html" class="saas-card saas-card-interactive p-3">
+              <div class="fw-semibold text-primary"><i class="bi bi-grid-1x2 me-2"></i>2. Dashboard</div>
+              <div class="small text-muted">Metrics & recent activities</div>
+            </a>
+          </div>
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <a href="generator.html" class="saas-card saas-card-interactive p-3">
+              <div class="fw-semibold text-primary"><i class="bi bi-magic me-2"></i>3. Code Generator</div>
+              <div class="small text-muted">Requirements to code</div>
+            </a>
+          </div>
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <a href="explainer.html" class="saas-card saas-card-interactive p-3">
+              <div class="fw-semibold text-primary"><i class="bi bi-journal-code me-2"></i>4. Code Explainer</div>
+              <div class="small text-muted">Step-by-step breakdown</div>
+            </a>
+          </div>
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <a href="debugger.html" class="saas-card saas-card-interactive p-3">
+              <div class="fw-semibold text-primary"><i class="bi bi-bug me-2"></i>5. Debug Assistant</div>
+              <div class="small text-muted">Error fix & verification</div>
+            </a>
+          </div>
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <a href="improver.html" class="saas-card saas-card-interactive p-3">
+              <div class="fw-semibold text-primary"><i class="bi bi-lightning me-2"></i>6. Code Improver</div>
+              <div class="small text-muted">Refactoring & standards</div>
+            </a>
+          </div>
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <a href="history.html" class="saas-card saas-card-interactive p-3">
+              <div class="fw-semibold text-primary"><i class="bi bi-clock-history me-2"></i>7. History</div>
+              <div class="small text-muted">Archived conversations</div>
+            </a>
+          </div>
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <a href="settings.html" class="saas-card saas-card-interactive p-3">
+              <div class="fw-semibold text-primary"><i class="bi bi-gear me-2"></i>8. Settings & API</div>
+              <div class="small text-muted">Backend URL & profile</div>
+            </a>
+          </div>
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <a href="login.html" class="saas-card saas-card-interactive p-3">
+              <div class="fw-semibold text-primary"><i class="bi bi-box-arrow-in-right me-2"></i>9. Login</div>
+              <div class="small text-muted">Authentication screen</div>
+            </a>
+          </div>
+          <div class="col-sm-6 col-md-4 col-lg-3">
+            <a href="register.html" class="saas-card saas-card-interactive p-3">
+              <div class="fw-semibold text-primary"><i class="bi bi-person-plus me-2"></i>10. Registration</div>
+              <div class="small text-muted">New user sign-up</div>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- System Architecture & Viva Technical Summary -->
+      <section class="saas-card p-4">
+        <h2 class="fs-5 fw-bold mb-3"><i class="bi bi-diagram-3 me-2 text-primary"></i>System Architecture (Client-Server Model)</h2>
+        <div class="row g-4 align-items-center">
+          <div class="col-md-7">
+            <p class="text-secondary small mb-3">
+              This application implements a decoupled, modern multi-tier architecture where the frontend client interfaces with a lightweight <strong>Python Flask REST API</strong> backend over asynchronous HTTP/JSON.
+            </p>
+            <ul class="list-unstyled small text-secondary d-flex flex-column gap-2">
+              <li class="d-flex align-items-start gap-2">
+                <i class="bi bi-check2-circle text-success mt-1"></i>
+                <span><strong>Presentation Layer:</strong> Modular HTML5, CSS3, ES6+ JavaScript with Bootstrap 5 and embedded Monaco Editor (VS Code engine).</span>
+              </li>
+              <li class="d-flex align-items-start gap-2">
+                <i class="bi bi-check2-circle text-success mt-1"></i>
+                <span><strong>Application & API Layer:</strong> Python Flask microservices handling route dispatching, token verification, and input validation.</span>
+              </li>
+              <li class="d-flex align-items-start gap-2">
+                <i class="bi bi-check2-circle text-success mt-1"></i>
+                <span><strong>Security Boundary:</strong> Zero AI provider API keys or database credentials exist on the client; all processing is secured server-side.</span>
+              </li>
+            </ul>
+          </div>
+          <div class="col-md-5">
+            <div class="p-3 rounded" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+              <div class="fw-semibold small mb-2 text-primary">Demonstration Viva Tip</div>
+              <p class="small text-muted mb-2">
+                Click <strong>"Launch Workspace"</strong> to test any of the 4 AI tasks live. You can test in standalone Viva Demo Mode or connect to your local Flask backend by clicking the status pill in the top header.
+              </p>
+              <a href="workspace.html" class="btn btn-sm btn-primary w-100">
+                Start Demonstration
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-top py-4 text-center text-muted small" style="border-color: var(--border-color) !important;">
+      <div class="content-container">
+        AI Coding Assistant · Final-Semester College Project · Computer Science & Engineering
+      </div>
+    </footer>
+
+    <!-- Bootstrap & Common Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/ui.js"></script>
+  </body>
+</html>

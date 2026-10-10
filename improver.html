@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Code Improvement - AI Coding Assistant</title>
+    <meta name="description" content="Refactor code for readability, performance, and modern best practices." />
+
+    <!-- Bootstrap 5 & Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Project Stylesheets -->
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/components.css" />
+  </head>
+  <body>
+    <div class="app-layout">
+      <!-- Left Sidebar -->
+      <aside class="app-sidebar">
+        <div class="sidebar-brand">
+          <a href="index.html" class="brand-link">
+            <div class="brand-logo-icon"><i class="bi bi-cpu"></i></div>
+            <span>AI Coding Assistant</span>
+          </a>
+        </div>
+
+        <div class="sidebar-actions">
+          <a href="workspace.html" class="btn-new-chat">
+            <i class="bi bi-plus-lg"></i>
+            <span>New Task</span>
+          </a>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Navigation</div>
+          <a href="dashboard.html" class="sidebar-nav-item">
+            <i class="bi bi-grid-1x2"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="workspace.html" class="sidebar-nav-item">
+            <i class="bi bi-terminal"></i>
+            <span>AI Workspace</span>
+          </a>
+
+          <div class="nav-section-label">Dedicated Tasks</div>
+          <a href="generator.html" class="sidebar-nav-item">
+            <i class="bi bi-magic"></i>
+            <span>Code Generator</span>
+          </a>
+          <a href="explainer.html" class="sidebar-nav-item">
+            <i class="bi bi-journal-code"></i>
+            <span>Code Explainer</span>
+          </a>
+          <a href="debugger.html" class="sidebar-nav-item">
+            <i class="bi bi-bug"></i>
+            <span>Debugging Assistant</span>
+          </a>
+          <a href="improver.html" class="sidebar-nav-item active">
+            <i class="bi bi-lightning-charge"></i>
+            <span>Code Improvement</span>
+          </a>
+
+          <div class="nav-section-label">Archive & System</div>
+          <a href="history.html" class="sidebar-nav-item">
+            <i class="bi bi-clock-history"></i>
+            <span>Conversation History</span>
+          </a>
+          <a href="settings.html" class="sidebar-nav-item">
+            <i class="bi bi-gear"></i>
+            <span>Profile & Settings</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <a href="settings.html" class="user-snippet">
+            <img 
+              src="/src/assets/images/avatar_student_dev_1791558006569.jpg" 
+              alt="Developer Avatar" 
+              class="user-avatar-img"
+              referrerpolicy="no-referrer"
+            />
+            <div class="user-info-text">
+              <div class="user-display-name">Alex Chen</div>
+              <div class="user-role-badge">CS Senior Project</div>
+            </div>
+            <i class="bi bi-chevron-right text-muted small ms-auto"></i>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Viewport -->
+      <div class="app-main">
+        <!-- Top Navigation Bar -->
+        <header class="app-topbar">
+          <div class="topbar-left">
+            <button class="btn-sidebar-toggle d-lg-none" aria-label="Toggle sidebar menu">
+              <i class="bi bi-list"></i>
+            </button>
+            <div class="topbar-breadcrumb">
+              <a href="dashboard.html">Workspace</a>
+              <span class="text-muted">/</span>
+              <span class="breadcrumb-current">Code Improvement</span>
+            </div>
+          </div>
+
+          <div class="topbar-right">
+            <button id="connection-status-btn" class="connection-pill" type="button">
+              <span class="status-indicator-dot"></span>
+              <span>Loading...</span>
+            </button>
+            <button id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Toggle dark/light theme">
+              <i class="bi bi-sun"></i>
+            </button>
+            <a href="workspace.html?task=improve" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-terminal me-1"></i> Open in Split IDE
+            </a>
+          </div>
+        </header>
+
+        <!-- Main Content View -->
+        <main class="content-container">
+          <div class="row g-4">
+            <!-- Left Column: Source Code to Refactor -->
+            <div class="col-lg-5">
+              <div class="saas-card h-100">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                  <div class="quick-action-icon improve m-0"><i class="bi bi-lightning-charge"></i></div>
+                  <div>
+                    <h1 class="fs-5 fw-bold mb-0">Code Improvement</h1>
+                    <p class="small text-muted mb-0">Elevate readability, performance & maintainability</p>
+                  </div>
+                </div>
+
+                <form id="improve-page-form">
+                  <!-- Language Selector -->
+                  <div class="mb-3">
+                    <label class="form-label-custom" for="improve-lang-select">Programming Language</label>
+                    <select id="improve-lang-select" class="form-select-sm-custom w-100 py-2">
+                      <option value="python" selected>Python</option>
+                      <option value="javascript">JavaScript</option>
+                      <option value="java">Java</option>
+                      <option value="c">C</option>
+                      <option value="cpp">C++</option>
+                      <option value="sql">SQL</option>
+                    </select>
+                  </div>
+
+                  <!-- Existing Code Input -->
+                  <div class="mb-3">
+                    <label class="form-label-custom" for="improve-code-input">Existing Code to Refactor</label>
+                    <textarea 
+                      id="improve-code-input" 
+                      class="instruction-textarea font-mono" 
+                      rows="8" 
+                      placeholder="Paste working code that could be structured more cleanly..."
+                      required
+                    ></textarea>
+                  </div>
+
+                  <!-- Specific Goals -->
+                  <div class="mb-3">
+                    <label class="form-label-custom" for="improve-goals-input">Refactoring Goals (Optional)</label>
+                    <input 
+                      type="text" 
+                      id="improve-goals-input" 
+                      class="form-control-custom" 
+                      placeholder="e.g. Reduce nesting, add type annotations, optimize loop allocations"
+                    />
+                  </div>
+
+                  <!-- Presets -->
+                  <div class="mb-4">
+                    <div class="small text-muted mb-2 fw-semibold">Sample Code:</div>
+                    <div class="d-flex flex-wrap gap-1">
+                      <button type="button" class="btn-sample-chip" onclick="document.getElementById('improve-code-input').value='def find_duplicates(arr):\n    dup = []\n    for i in range(len(arr)):\n        for j in range(i+1, len(arr)):\n            if arr[i] == arr[j] and arr[i] not in dup:\n                dup.append(arr[i])\n    return dup'; document.getElementById('improve-goals-input').value='Eliminate O(n^2) nested loop using Hash Set lookup'; document.getElementById('improve-lang-select').value='python';">
+                        O(n²) to O(n) Optimization (Python)
+                      </button>
+                    </div>
+                  </div>
+
+                  <button type="submit" id="btn-improve-submit" class="btn-primary-action w-100 py-2">
+                    <span id="btn-improve-text"><i class="bi bi-lightning me-1"></i> Refactor & Optimize</span>
+                    <span id="btn-improve-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Right Column: Refactored Code & Best Practices -->
+            <div class="col-lg-7">
+              <div class="saas-card h-100 d-flex flex-column">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom" style="border-color: var(--border-color) !important;">
+                  <h2 class="fs-6 fw-bold mb-0">Refactored Output & Improvements</h2>
+                  <div class="d-flex gap-2" id="improve-actions-box" style="display: none !important;">
+                    <button type="button" class="btn-icon-action" id="btn-improve-copy">
+                      <i class="bi bi-clipboard"></i> Copy
+                    </button>
+                    <button type="button" class="btn-icon-action" id="btn-improve-download">
+                      <i class="bi bi-download"></i> Download
+                    </button>
+                  </div>
+                </div>
+
+                <div id="improve-empty-state" class="empty-state-card my-auto">
+                  <i class="bi bi-lightning-charge empty-state-icon text-success"></i>
+                  <div class="empty-state-title">No Code Refactored Yet</div>
+                  <p class="empty-state-subtitle">Paste existing code on the left and click "Refactor & Optimize".</p>
+                </div>
+
+                <div id="improve-result-container" class="d-flex flex-column gap-3" style="display: none;">
+                  <div class="output-code-card">
+                    <div class="output-code-header">
+                      <span class="output-code-lang" id="improve-lang-badge">PYTHON</span>
+                      <span class="badge bg-success-subtle text-success border border-success-subtle small">OPTIMIZED</span>
+                    </div>
+                    <pre class="output-code-pre"><code id="improve-code-text"></code></pre>
+                  </div>
+
+                  <div class="output-explanation-card">
+                    <h3 class="fs-6 fw-bold mb-2 text-success"><i class="bi bi-check2-circle me-2"></i>Summary of Improvements</h3>
+                    <div class="output-explanation-content" id="improve-explanation-body"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.1/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/ui.js"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('improve-page-form');
+        const emptyState = document.getElementById('improve-empty-state');
+        const resultContainer = document.getElementById('improve-result-container');
+        const actionsBox = document.getElementById('improve-actions-box');
+        const codeText = document.getElementById('improve-code-text');
+        const explanationBody = document.getElementById('improve-explanation-body');
+        const langBadge = document.getElementById('improve-lang-badge');
+
+        let lastImprovedCode = '';
+        let lastLang = 'python';
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const lang = document.getElementById('improve-lang-select').value;
+          const code = document.getElementById('improve-code-input').value.trim();
+          const goals = document.getElementById('improve-goals-input').value.trim();
+
+          if (!code) {
+            UI.showToast('Please provide code to improve.', 'error');
+            return;
+          }
+
+          const btnSubmit = document.getElementById('btn-improve-submit');
+          const btnText = document.getElementById('btn-improve-text');
+          const btnSpinner = document.getElementById('btn-improve-spinner');
+
+          btnSubmit.disabled = true;
+          btnText.classList.add('d-none');
+          btnSpinner.classList.remove('d-none');
+
+          try {
+            const res = await API.improveCode({
+              language: lang,
+              code: code,
+              instruction: goals
+            });
+
+            lastImprovedCode = res.improved_code || '';
+            lastLang = lang;
+
+            emptyState.style.display = 'none';
+            resultContainer.style.display = 'flex';
+            actionsBox.style.display = 'flex';
+
+            codeText.textContent = lastImprovedCode;
+            langBadge.textContent = lang.toUpperCase();
+
+            let practices = (res.best_practices || []).map(p => `- ${p}`).join('\n');
+            const summaryMd = `
+### Overview of Changes
+${res.summary_of_changes || ''}
+
+### Readability & Maintainability
+${res.readability_notes || ''}
+
+### Performance & Memory Efficiency
+${res.performance_notes || ''}
+
+### Applied Modern Idioms
+${practices}
+            `;
+            explanationBody.innerHTML = UI.formatMarkdown(summaryMd);
+
+            API.saveConversation({
+              task: 'improve',
+              language: lang,
+              instruction: goals || 'Code improvement',
+              code: code,
+              response: res
+            });
+
+            UI.showToast('Code successfully improved!', 'success');
+          } catch (err) {
+            UI.showToast(err.message || 'Improvement failed', 'error');
+          } finally {
+            btnSubmit.disabled = false;
+            btnText.classList.remove('d-none');
+            btnSpinner.classList.add('d-none');
+          }
+        });
+
+        document.getElementById('btn-improve-copy').addEventListener('click', () => {
+          if (lastImprovedCode) UI.copyToClipboard(lastImprovedCode, document.getElementById('btn-improve-copy'));
+        });
+
+        document.getElementById('btn-improve-download').addEventListener('click', () => {
+          if (lastImprovedCode) {
+            const langObj = CONFIG.SUPPORTED_LANGUAGES.find(l => l.id === lastLang) || { ext: '.txt' };
+            UI.downloadFile(`improved_code_${Date.now()}${langObj.ext}`, lastImprovedCode);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

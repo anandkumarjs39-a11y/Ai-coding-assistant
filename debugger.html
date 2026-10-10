@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Debugging Assistant - AI Coding Assistant</title>
+    <meta name="description" content="Isolate programming bugs, analyze root causes, and inspect verified fixes." />
+
+    <!-- Bootstrap 5 & Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Project Stylesheets -->
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/components.css" />
+  </head>
+  <body>
+    <div class="app-layout">
+      <!-- Left Sidebar -->
+      <aside class="app-sidebar">
+        <div class="sidebar-brand">
+          <a href="index.html" class="brand-link">
+            <div class="brand-logo-icon"><i class="bi bi-cpu"></i></div>
+            <span>AI Coding Assistant</span>
+          </a>
+        </div>
+
+        <div class="sidebar-actions">
+          <a href="workspace.html" class="btn-new-chat">
+            <i class="bi bi-plus-lg"></i>
+            <span>New Task</span>
+          </a>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Navigation</div>
+          <a href="dashboard.html" class="sidebar-nav-item">
+            <i class="bi bi-grid-1x2"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="workspace.html" class="sidebar-nav-item">
+            <i class="bi bi-terminal"></i>
+            <span>AI Workspace</span>
+          </a>
+
+          <div class="nav-section-label">Dedicated Tasks</div>
+          <a href="generator.html" class="sidebar-nav-item">
+            <i class="bi bi-magic"></i>
+            <span>Code Generator</span>
+          </a>
+          <a href="explainer.html" class="sidebar-nav-item">
+            <i class="bi bi-journal-code"></i>
+            <span>Code Explainer</span>
+          </a>
+          <a href="debugger.html" class="sidebar-nav-item active">
+            <i class="bi bi-bug"></i>
+            <span>Debugging Assistant</span>
+          </a>
+          <a href="improver.html" class="sidebar-nav-item">
+            <i class="bi bi-lightning-charge"></i>
+            <span>Code Improvement</span>
+          </a>
+
+          <div class="nav-section-label">Archive & System</div>
+          <a href="history.html" class="sidebar-nav-item">
+            <i class="bi bi-clock-history"></i>
+            <span>Conversation History</span>
+          </a>
+          <a href="settings.html" class="sidebar-nav-item">
+            <i class="bi bi-gear"></i>
+            <span>Profile & Settings</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <a href="settings.html" class="user-snippet">
+            <img 
+              src="/src/assets/images/avatar_student_dev_1791558006569.jpg" 
+              alt="Developer Avatar" 
+              class="user-avatar-img"
+              referrerpolicy="no-referrer"
+            />
+            <div class="user-info-text">
+              <div class="user-display-name">Alex Chen</div>
+              <div class="user-role-badge">CS Senior Project</div>
+            </div>
+            <i class="bi bi-chevron-right text-muted small ms-auto"></i>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Viewport -->
+      <div class="app-main">
+        <!-- Top Navigation Bar -->
+        <header class="app-topbar">
+          <div class="topbar-left">
+            <button class="btn-sidebar-toggle d-lg-none" aria-label="Toggle sidebar menu">
+              <i class="bi bi-list"></i>
+            </button>
+            <div class="topbar-breadcrumb">
+              <a href="dashboard.html">Workspace</a>
+              <span class="text-muted">/</span>
+              <span class="breadcrumb-current">Debugging Assistant</span>
+            </div>
+          </div>
+
+          <div class="topbar-right">
+            <button id="connection-status-btn" class="connection-pill" type="button">
+              <span class="status-indicator-dot"></span>
+              <span>Loading...</span>
+            </button>
+            <button id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Toggle dark/light theme">
+              <i class="bi bi-sun"></i>
+            </button>
+            <a href="workspace.html?task=debug" class="btn btn-sm btn-outline-primary">
+              <i class="bi bi-terminal me-1"></i> Open in Split IDE
+            </a>
+          </div>
+        </header>
+
+        <!-- Main Content View -->
+        <main class="content-container">
+          <div class="row g-4">
+            <!-- Left Column: Buggy Code Input -->
+            <div class="col-lg-5">
+              <div class="saas-card h-100">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                  <div class="quick-action-icon debug m-0"><i class="bi bi-bug"></i></div>
+                  <div>
+                    <h1 class="fs-5 fw-bold mb-0">Debugging Assistant</h1>
+                    <p class="small text-muted mb-0">Isolate syntax, runtime exceptions & logic flaws</p>
+                  </div>
+                </div>
+
+                <form id="debug-page-form">
+                  <!-- Language Selector -->
+                  <div class="mb-3">
+                    <label class="form-label-custom" for="debug-lang-select">Programming Language</label>
+                    <select id="debug-lang-select" class="form-select-sm-custom w-100 py-2">
+                      <option value="python" selected>Python</option>
+                      <option value="javascript">JavaScript</option>
+                      <option value="java">Java</option>
+                      <option value="c">C</option>
+                      <option value="cpp">C++</option>
+                      <option value="sql">SQL</option>
+                    </select>
+                  </div>
+
+                  <!-- Buggy Code Input -->
+                  <div class="mb-3">
+                    <label class="form-label-custom" for="debug-code-input">Buggy Source Code</label>
+                    <textarea 
+                      id="debug-code-input" 
+                      class="instruction-textarea font-mono" 
+                      rows="7" 
+                      placeholder="Paste code containing bugs or exceptions..."
+                      required
+                    ></textarea>
+                  </div>
+
+                  <!-- Optional Error Traceback -->
+                  <div class="mb-3">
+                    <label class="form-label-custom" for="debug-trace-input">
+                      Error Message / Traceback (Optional)
+                    </label>
+                    <input 
+                      type="text" 
+                      id="debug-trace-input" 
+                      class="form-control-custom" 
+                      placeholder="e.g. IndexError: list index out of range at line 14"
+                    />
+                  </div>
+
+                  <!-- Presets -->
+                  <div class="mb-4">
+                    <div class="small text-muted mb-2 fw-semibold">Load Sample Bug:</div>
+                    <div class="d-flex flex-wrap gap-1">
+                      <button type="button" class="btn-sample-chip" onclick="document.getElementById('debug-code-input').value='def binary_search(arr, x):\n    low = 0\n    high = len(arr) # Bug: should be len(arr)-1\n    while low <= high:\n        mid = (low + high) // 2\n        if arr[mid] == x:\n            return mid\n        elif arr[mid] < x:\n            low = mid + 1\n        else:\n            high = mid - 1\n    return -1'; document.getElementById('debug-trace-input').value='IndexError: list index out of range'; document.getElementById('debug-lang-select').value='python';">
+                        Off-by-One Loop Bug (Python)
+                      </button>
+                      <button type="button" class="btn-sample-chip" onclick="document.getElementById('debug-code-input').value='function parsePrices(items) {\n  return items.map(i => i.price.toFixed(2)); // Crashes if item has no price\n}'; document.getElementById('debug-trace-input').value='TypeError: Cannot read properties of undefined'; document.getElementById('debug-lang-select').value='javascript';">
+                        Unchecked Null Dereference (JS)
+                      </button>
+                    </div>
+                  </div>
+
+                  <button type="submit" id="btn-debug-submit" class="btn-primary-action w-100 py-2">
+                    <span id="btn-debug-text"><i class="bi bi-shield-check me-1"></i> Diagnose & Fix Bug</span>
+                    <span id="btn-debug-spinner" class="spinner-border spinner-border-sm d-none" role="status"></span>
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Right Column: Diagnostics & Fix -->
+            <div class="col-lg-7">
+              <div class="saas-card h-100 d-flex flex-column">
+                <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom" style="border-color: var(--border-color) !important;">
+                  <h2 class="fs-6 fw-bold mb-0">Bug Diagnosis & Corrected Code</h2>
+                  <div class="d-flex gap-2" id="debug-actions-box" style="display: none !important;">
+                    <button type="button" class="btn-icon-action" id="btn-debug-copy">
+                      <i class="bi bi-clipboard"></i> Copy Fix
+                    </button>
+                    <button type="button" class="btn-icon-action" id="btn-debug-download">
+                      <i class="bi bi-download"></i> Download
+                    </button>
+                  </div>
+                </div>
+
+                <div id="debug-empty-state" class="empty-state-card my-auto">
+                  <i class="bi bi-bug empty-state-icon text-danger"></i>
+                  <div class="empty-state-title">No Diagnostics Performed Yet</div>
+                  <p class="empty-state-subtitle">Paste code and any error trace on the left, then click "Diagnose & Fix Bug".</p>
+                </div>
+
+                <div id="debug-result-container" class="d-flex flex-column gap-3" style="display: none;">
+                  <!-- Corrected Code Card -->
+                  <div class="output-code-card">
+                    <div class="output-code-header">
+                      <span class="output-code-lang" id="debug-lang-badge">PYTHON</span>
+                      <span class="badge bg-success-subtle text-success border border-success-subtle small">VERIFIED CORRECTION</span>
+                    </div>
+                    <pre class="output-code-pre"><code id="debug-code-text"></code></pre>
+                  </div>
+
+                  <!-- Diagnostics Details -->
+                  <div class="output-explanation-card">
+                    <h3 class="fs-6 fw-bold mb-2 text-warning"><i class="bi bi-shield-exclamation me-2"></i>Root Cause Analysis</h3>
+                    <div class="output-explanation-content" id="debug-analysis-body"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.1/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/ui.js"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('debug-page-form');
+        const emptyState = document.getElementById('debug-empty-state');
+        const resultContainer = document.getElementById('debug-result-container');
+        const actionsBox = document.getElementById('debug-actions-box');
+        const codeText = document.getElementById('debug-code-text');
+        const analysisBody = document.getElementById('debug-analysis-body');
+        const langBadge = document.getElementById('debug-lang-badge');
+
+        let lastFixCode = '';
+        let lastLang = 'python';
+
+        form.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          const lang = document.getElementById('debug-lang-select').value;
+          const code = document.getElementById('debug-code-input').value.trim();
+          const trace = document.getElementById('debug-trace-input').value.trim();
+
+          if (!code) {
+            UI.showToast('Please provide buggy code to diagnose.', 'error');
+            return;
+          }
+
+          const btnSubmit = document.getElementById('btn-debug-submit');
+          const btnText = document.getElementById('btn-debug-text');
+          const btnSpinner = document.getElementById('btn-debug-spinner');
+
+          btnSubmit.disabled = true;
+          btnText.classList.add('d-none');
+          btnSpinner.classList.remove('d-none');
+
+          try {
+            const res = await API.debugCode({
+              language: lang,
+              code: code,
+              error_message: trace
+            });
+
+            lastFixCode = res.corrected_code || '';
+            lastLang = lang;
+
+            emptyState.style.display = 'none';
+            resultContainer.style.display = 'flex';
+            actionsBox.style.display = 'flex';
+
+            codeText.textContent = lastFixCode;
+            langBadge.textContent = lang.toUpperCase();
+
+            const analysisMd = `
+### Problem Summary
+${res.problem_summary || ''}
+
+### Likely Root Cause
+${res.likely_cause || ''}
+
+### Recommended Correction
+${res.suggested_fix || ''}
+
+### Technical Justification
+${res.fix_explanation || ''}
+            `;
+            analysisBody.innerHTML = UI.formatMarkdown(analysisMd);
+
+            API.saveConversation({
+              task: 'debug',
+              language: lang,
+              instruction: trace || 'Code debugging',
+              code: code,
+              response: res
+            });
+
+            UI.showToast('Bug diagnosed and resolved!', 'success');
+          } catch (err) {
+            UI.showToast(err.message || 'Debug analysis failed', 'error');
+          } finally {
+            btnSubmit.disabled = false;
+            btnText.classList.remove('d-none');
+            btnSpinner.classList.add('d-none');
+          }
+        });
+
+        document.getElementById('btn-debug-copy').addEventListener('click', () => {
+          if (lastFixCode) UI.copyToClipboard(lastFixCode, document.getElementById('btn-debug-copy'));
+        });
+
+        document.getElementById('btn-debug-download').addEventListener('click', () => {
+          if (lastFixCode) {
+            const langObj = CONFIG.SUPPORTED_LANGUAGES.find(l => l.id === lastLang) || { ext: '.txt' };
+            UI.downloadFile(`fixed_code_${Date.now()}${langObj.ext}`, lastFixCode);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

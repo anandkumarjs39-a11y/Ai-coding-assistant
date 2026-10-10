@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Workspace - AI Coding Assistant</title>
+    <meta name="description" content="Dedicated AI Coding Workspace for generating, explaining, debugging, and improving software code." />
+
+    <!-- Bootstrap 5 & Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Project Stylesheets -->
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/components.css" />
+  </head>
+  <body>
+    <div class="app-layout">
+      <!-- Left Sidebar -->
+      <aside class="app-sidebar">
+        <div class="sidebar-brand">
+          <a href="index.html" class="brand-link">
+            <div class="brand-logo-icon"><i class="bi bi-cpu"></i></div>
+            <span>AI Coding Assistant</span>
+          </a>
+        </div>
+
+        <div class="sidebar-actions">
+          <button id="btn-new-conversation" class="btn-new-chat" type="button">
+            <i class="bi bi-plus-lg"></i>
+            <span>New Task</span>
+          </button>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Navigation</div>
+          <a href="dashboard.html" class="sidebar-nav-item">
+            <i class="bi bi-grid-1x2"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="workspace.html" class="sidebar-nav-item active">
+            <i class="bi bi-terminal"></i>
+            <span>AI Workspace</span>
+          </a>
+
+          <div class="nav-section-label">Dedicated Tasks</div>
+          <a href="generator.html" class="sidebar-nav-item">
+            <i class="bi bi-magic"></i>
+            <span>Code Generator</span>
+          </a>
+          <a href="explainer.html" class="sidebar-nav-item">
+            <i class="bi bi-journal-code"></i>
+            <span>Code Explainer</span>
+          </a>
+          <a href="debugger.html" class="sidebar-nav-item">
+            <i class="bi bi-bug"></i>
+            <span>Debugging Assistant</span>
+          </a>
+          <a href="improver.html" class="sidebar-nav-item">
+            <i class="bi bi-lightning-charge"></i>
+            <span>Code Improvement</span>
+          </a>
+
+          <div class="nav-section-label">Archive & System</div>
+          <a href="history.html" class="sidebar-nav-item">
+            <i class="bi bi-clock-history"></i>
+            <span>Conversation History</span>
+          </a>
+          <a href="settings.html" class="sidebar-nav-item">
+            <i class="bi bi-gear"></i>
+            <span>Profile & Settings</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <a href="settings.html" class="user-snippet">
+            <img 
+              src="/src/assets/images/avatar_student_dev_1791558006569.jpg" 
+              alt="Developer Avatar" 
+              class="user-avatar-img"
+              referrerpolicy="no-referrer"
+            />
+            <div class="user-info-text">
+              <div class="user-display-name">Alex Chen</div>
+              <div class="user-role-badge">CS Senior Project</div>
+            </div>
+            <i class="bi bi-chevron-right text-muted small ms-auto"></i>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Workspace Viewport -->
+      <div class="app-main">
+        <!-- Top Navigation Bar -->
+        <header class="app-topbar">
+          <div class="topbar-left">
+            <button class="btn-sidebar-toggle d-lg-none" aria-label="Toggle sidebar menu">
+              <i class="bi bi-list"></i>
+            </button>
+            <div class="topbar-breadcrumb">
+              <a href="dashboard.html">Workspace</a>
+              <span class="text-muted">/</span>
+              <span class="breadcrumb-current" id="workspace-task-title">Code Generator</span>
+            </div>
+          </div>
+
+          <div class="topbar-right">
+            <!-- Backend Status Connection Button -->
+            <button id="connection-status-btn" class="connection-pill" type="button">
+              <span class="status-indicator-dot"></span>
+              <span>Loading...</span>
+            </button>
+
+            <!-- Theme Toggler -->
+            <button id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Toggle dark/light theme">
+              <i class="bi bi-sun"></i>
+            </button>
+
+            <a href="history.html" class="btn btn-sm btn-outline-secondary d-none d-sm-inline-flex align-items-center gap-1">
+              <i class="bi bi-clock-history"></i> History
+            </a>
+          </div>
+        </header>
+
+        <!-- Primary Workspace Container -->
+        <div class="workspace-wrapper">
+          <!-- Top Workspace Toolbar -->
+          <div class="workspace-toolbar">
+            <div class="toolbar-controls">
+              <!-- Task Selector -->
+              <div class="toolbar-select-group">
+                <label for="task-selector"><i class="bi bi-layers text-primary me-1"></i>Task:</label>
+                <select id="task-selector" class="form-select-sm-custom">
+                  <option value="generate">Generate Code</option>
+                  <option value="explain">Explain Code</option>
+                  <option value="debug">Debug Code</option>
+                  <option value="improve">Improve Code</option>
+                </select>
+              </div>
+
+              <!-- Programming Language Selector -->
+              <div class="toolbar-select-group">
+                <label for="language-selector"><i class="bi bi-code-slash text-info me-1"></i>Language:</label>
+                <select id="language-selector" class="form-select-sm-custom">
+                  <option value="python">Python (.py)</option>
+                  <option value="javascript">JavaScript (.js)</option>
+                  <option value="java">Java (.java)</option>
+                  <option value="c">C (.c)</option>
+                  <option value="cpp">C++ (.cpp)</option>
+                  <option value="sql">SQL (.sql)</option>
+                </select>
+              </div>
+
+              <!-- Complexity Selector (For Generator) -->
+              <div class="toolbar-select-group" id="complexity-selector-group">
+                <label for="complexity-selector"><i class="bi bi-bar-chart-steps text-warning me-1"></i>Level:</label>
+                <select id="complexity-selector" class="form-select-sm-custom">
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate" selected>Intermediate</option>
+                  <option value="Advanced">Advanced (Production)</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Submit Action -->
+            <div class="d-flex align-items-center gap-2">
+              <button id="btn-submit-task" class="btn-primary-action px-3" type="button">
+                <i class="bi bi-stars me-1"></i> Ask AI
+              </button>
+            </div>
+          </div>
+
+          <!-- Example Prompts Bar -->
+          <div class="px-3 py-1 bg-surface border-bottom d-flex align-items-center gap-2" style="background-color: var(--bg-surface); border-color: var(--border-color) !important;">
+            <span class="small text-muted fw-semibold whitespace-nowrap"><i class="bi bi-lightbulb text-warning me-1"></i>Demo Prompts:</span>
+            <div class="example-prompts-bar flex-grow-1" id="sample-prompts-container">
+              <!-- Dynamically populated via workspace.js -->
+            </div>
+          </div>
+
+          <!-- Split Pane Layout (Desktop Split / Mobile Stack) -->
+          <div class="workspace-panes">
+            <!-- Left Pane: Input (Instructions & Monaco Editor) -->
+            <div class="pane-input">
+              <!-- Instruction Box -->
+              <div class="instruction-box-container">
+                <div class="d-flex align-items-center justify-content-between mb-1">
+                  <label for="instruction-input" class="form-label-custom mb-0" id="instruction-label">
+                    Natural Language Requirements / Instructions
+                  </label>
+                  <button type="button" class="btn btn-sm btn-link text-muted p-0 text-decoration-none small" id="btn-clear-instructions">
+                    <i class="bi bi-x-circle me-1"></i>Clear
+                  </button>
+                </div>
+                <textarea 
+                  id="instruction-input" 
+                  class="instruction-textarea" 
+                  rows="2" 
+                  placeholder="e.g. Write an algorithm to solve the 0/1 Knapsack problem with dynamic programming..."
+                ></textarea>
+              </div>
+
+              <!-- Debug Error Field (Shown for Debug task) -->
+              <div id="error-message-group" class="px-3 py-2 border-bottom" style="display: none; background: var(--bg-surface-subtle); border-color: var(--border-color) !important;">
+                <label for="debug-error-input" class="form-label-custom small mb-1 text-danger">
+                  <i class="bi bi-exclamation-octagon me-1"></i>Console Error / Traceback (Optional)
+                </label>
+                <input 
+                  type="text" 
+                  id="debug-error-input" 
+                  class="form-control-custom form-control-sm" 
+                  placeholder="e.g. IndexError: list index out of range at line 14 or TypeError: unsupported operand"
+                />
+              </div>
+
+              <!-- Monaco Code Editor Header Bar -->
+              <div class="pane-header">
+                <div class="pane-title">
+                  <i class="bi bi-code-square text-primary"></i>
+                  <span>Source Code</span>
+                  <span class="text-muted fw-normal small ms-1" id="editor-required-badge">(Optional Reference)</span>
+                </div>
+                <div class="pane-actions">
+                  <button type="button" class="btn-icon-action" id="btn-reset-sample" title="Load Starter Code">
+                    <i class="bi bi-arrow-repeat"></i> Starter Snippet
+                  </button>
+                  <button type="button" class="btn-icon-action" id="btn-clear-editor" title="Clear Code">
+                    <i class="bi bi-trash"></i> Clear
+                  </button>
+                </div>
+              </div>
+
+              <!-- Monaco Editor Canvas Container -->
+              <div class="editor-container-wrapper">
+                <div id="monaco-editor-container"></div>
+              </div>
+
+              <!-- Editor Status Bar Footer -->
+              <div class="editor-footer-bar">
+                <div class="d-flex align-items-center gap-3">
+                  <span id="editor-lang-indicator" class="font-mono text-uppercase">Python</span>
+                  <span id="editor-lines-count">0 lines</span>
+                  <span id="editor-chars-count">0 chars</span>
+                </div>
+                <div>
+                  <span class="text-muted">UTF-8 · Tab Size: 4</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Pane: Structured Output Presentation -->
+            <div class="pane-output">
+              <div class="pane-header">
+                <div class="pane-title">
+                  <i class="bi bi-cpu text-info"></i>
+                  <span>AI Response & Reasoning</span>
+                </div>
+                <div class="pane-actions">
+                  <button type="button" class="btn-icon-action" id="btn-regenerate" title="Regenerate Response">
+                    <i class="bi bi-arrow-clockwise"></i> Regenerate
+                  </button>
+                </div>
+              </div>
+
+              <div class="output-scroll-container">
+                <!-- 1. Initial Empty State -->
+                <div id="output-empty-state" class="empty-state-card">
+                  <i class="bi bi-terminal-split empty-state-icon"></i>
+                  <div class="empty-state-title">Ready for Code Execution</div>
+                  <p class="empty-state-subtitle">
+                    Select your task and language on the toolbar, enter instructions or source code, and click <strong>Ask AI</strong> to receive structured code and analysis.
+                  </p>
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-sm btn-outline-primary" onclick="document.querySelector('.btn-sample-chip')?.click()">
+                      <i class="bi bi-lightning-charge me-1"></i> Try Sample Prompt
+                    </button>
+                  </div>
+                </div>
+
+                <!-- 2. Loading State -->
+                <div id="output-loading-state" class="loading-overlay" style="display: none;">
+                  <div class="spinner-ai"></div>
+                  <div class="fw-bold fs-6 mb-1">Synthesizing Response...</div>
+                  <p class="small text-muted mb-0">Analyzing syntax rules, complexity constraints, and idiomatic patterns</p>
+                </div>
+
+                <!-- 3. Formatted Result Output Container -->
+                <div id="output-result-container" style="display: none; flex-direction: column; gap: 1.25rem;">
+                  <!-- Output Code Card -->
+                  <div class="output-code-card" id="output-code-card">
+                    <div class="output-code-header">
+                      <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-file-earmark-code text-primary"></i>
+                        <span class="output-code-lang" id="output-lang-label">PYTHON</span>
+                      </div>
+                      <div class="d-flex align-items-center gap-1">
+                        <button type="button" class="btn-icon-action" id="btn-copy-code" title="Copy code to clipboard">
+                          <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                        <button type="button" class="btn-icon-action" id="btn-download-code" title="Download as code file">
+                          <i class="bi bi-download"></i> Download
+                        </button>
+                      </div>
+                    </div>
+                    <pre class="output-code-pre"><code id="output-code-text"></code></pre>
+                  </div>
+
+                  <!-- Output Explanation / Algorithmic Breakdown Card -->
+                  <div class="output-explanation-card" id="output-explanation-card">
+                    <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom" style="border-color: var(--border-color) !important;">
+                      <h3 class="fs-6 fw-bold mb-0" id="output-explanation-title">
+                        <i class="bi bi-info-circle text-primary me-2"></i>Algorithmic Breakdown & Analysis
+                      </h3>
+                      <span class="badge bg-secondary-subtle text-secondary small">Validated</span>
+                    </div>
+                    <div class="output-explanation-content" id="output-explanation-body">
+                      <!-- Markdown rendered safely via DOMPurify -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap & Vendor Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.1/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.9/dist/purify.min.js"></script>
+    <!-- Monaco Editor Loader -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+
+    <!-- Application Modules -->
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/ui.js"></script>
+    <script src="/assets/js/workspace.js"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        Workspace.init();
+      });
+    </script>
+  </body>
+</html>

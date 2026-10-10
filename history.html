@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Conversation History - AI Coding Assistant</title>
+    <meta name="description" content="View and manage previous AI coding sessions and conversations." />
+
+    <!-- Bootstrap 5 & Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
+    <!-- Project Stylesheets -->
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/components.css" />
+  </head>
+  <body>
+    <div class="app-layout">
+      <!-- Left Sidebar -->
+      <aside class="app-sidebar">
+        <div class="sidebar-brand">
+          <a href="index.html" class="brand-link">
+            <div class="brand-logo-icon"><i class="bi bi-cpu"></i></div>
+            <span>AI Coding Assistant</span>
+          </a>
+        </div>
+
+        <div class="sidebar-actions">
+          <a href="workspace.html" class="btn-new-chat">
+            <i class="bi bi-plus-lg"></i>
+            <span>New Task</span>
+          </a>
+        </div>
+
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Navigation</div>
+          <a href="dashboard.html" class="sidebar-nav-item">
+            <i class="bi bi-grid-1x2"></i>
+            <span>Dashboard</span>
+          </a>
+          <a href="workspace.html" class="sidebar-nav-item">
+            <i class="bi bi-terminal"></i>
+            <span>AI Workspace</span>
+          </a>
+
+          <div class="nav-section-label">Dedicated Tasks</div>
+          <a href="generator.html" class="sidebar-nav-item">
+            <i class="bi bi-magic"></i>
+            <span>Code Generator</span>
+          </a>
+          <a href="explainer.html" class="sidebar-nav-item">
+            <i class="bi bi-journal-code"></i>
+            <span>Code Explainer</span>
+          </a>
+          <a href="debugger.html" class="sidebar-nav-item">
+            <i class="bi bi-bug"></i>
+            <span>Debugging Assistant</span>
+          </a>
+          <a href="improver.html" class="sidebar-nav-item">
+            <i class="bi bi-lightning-charge"></i>
+            <span>Code Improvement</span>
+          </a>
+
+          <div class="nav-section-label">Archive & System</div>
+          <a href="history.html" class="sidebar-nav-item active">
+            <i class="bi bi-clock-history"></i>
+            <span>Conversation History</span>
+          </a>
+          <a href="settings.html" class="sidebar-nav-item">
+            <i class="bi bi-gear"></i>
+            <span>Profile & Settings</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-footer">
+          <a href="settings.html" class="user-snippet">
+            <img 
+              src="/src/assets/images/avatar_student_dev_1791558006569.jpg" 
+              alt="Developer Avatar" 
+              class="user-avatar-img"
+              referrerpolicy="no-referrer"
+            />
+            <div class="user-info-text">
+              <div class="user-display-name">Alex Chen</div>
+              <div class="user-role-badge">CS Senior Project</div>
+            </div>
+            <i class="bi bi-chevron-right text-muted small ms-auto"></i>
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Viewport -->
+      <div class="app-main">
+        <!-- Top Navigation Bar -->
+        <header class="app-topbar">
+          <div class="topbar-left">
+            <button class="btn-sidebar-toggle d-lg-none" aria-label="Toggle sidebar menu">
+              <i class="bi bi-list"></i>
+            </button>
+            <div class="topbar-breadcrumb">
+              <a href="dashboard.html">Workspace</a>
+              <span class="text-muted">/</span>
+              <span class="breadcrumb-current">Conversation History</span>
+            </div>
+          </div>
+
+          <div class="topbar-right">
+            <button id="connection-status-btn" class="connection-pill" type="button">
+              <span class="status-indicator-dot"></span>
+              <span>Loading...</span>
+            </button>
+            <button id="theme-toggle-btn" class="theme-toggle-btn" aria-label="Toggle dark/light theme">
+              <i class="bi bi-sun"></i>
+            </button>
+          </div>
+        </header>
+
+        <!-- Main Content View -->
+        <main class="content-container">
+          <!-- Page Header -->
+          <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">
+            <div>
+              <h1 class="section-title fs-4 mb-1">Conversation & Task History</h1>
+              <p class="section-desc mb-0">Search and review your past code generations, debugging records, and explanations.</p>
+            </div>
+            <div>
+              <span id="history-total-count" class="badge bg-secondary-subtle text-secondary border px-3 py-2 font-mono">0 saved</span>
+            </div>
+          </div>
+
+          <!-- Filter & Search Toolbar -->
+          <div class="saas-card p-3 mb-4">
+            <div class="row g-3 align-items-center">
+              <div class="col-md-7 col-lg-8">
+                <div class="position-relative">
+                  <i class="bi bi-search position-absolute top-50 translate-middle-y ms-3 text-muted"></i>
+                  <input 
+                    type="text" 
+                    id="history-search-input" 
+                    class="form-control-custom ps-5" 
+                    placeholder="Search by keywords, language, or instruction..."
+                  />
+                </div>
+              </div>
+              <div class="col-md-5 col-lg-4">
+                <div class="d-flex align-items-center gap-2">
+                  <label for="history-task-filter" class="form-label-custom mb-0 small text-muted whitespace-nowrap">Task Filter:</label>
+                  <select id="history-task-filter" class="form-select-sm-custom flex-grow-1">
+                    <option value="all">All Tasks</option>
+                    <option value="generate">Generate Code</option>
+                    <option value="explain">Explain Code</option>
+                    <option value="debug">Debug Code</option>
+                    <option value="improve">Improve Code</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- History Table -->
+          <div class="saas-card p-0 overflow-hidden">
+            <div class="table-responsive">
+              <table class="data-table mb-0">
+                <thead>
+                  <tr>
+                    <th>Title & Task Details</th>
+                    <th>Task Type</th>
+                    <th>Language</th>
+                    <th>Timestamp</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="history-table-body">
+                  <!-- Dynamically populated via history.js -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="history-loading-indicator" class="p-4 text-center text-muted small" style="display: none;">
+              <span class="spinner-border spinner-border-sm me-2" role="status"></span> Loading conversation records...
+            </div>
+
+            <!-- Empty State -->
+            <div id="history-empty-state" class="empty-state-card py-5" style="display: none;">
+              <i class="bi bi-clock-history empty-state-icon"></i>
+              <div class="empty-state-title">No Conversations Found</div>
+              <p class="empty-state-subtitle">No matching sessions in your history. Perform tasks in the workspace to save records.</p>
+              <a href="workspace.html" class="btn-primary-action btn-sm text-decoration-none">
+                <i class="bi bi-terminal me-1"></i> Open Workspace
+              </a>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: var(--bg-surface); border: 1px solid var(--border-color); color: var(--text-primary); border-radius: var(--radius-md);">
+          <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+            <h5 class="modal-title fs-6 fw-bold text-danger" id="deleteModalLabel">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Deletion
+            </h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(var(--bs-btn-close-filter, 0.5));"></button>
+          </div>
+          <div class="modal-body">
+            <p class="mb-2">Are you sure you want to delete this conversation session?</p>
+            <div class="p-2 rounded bg-surface-subtle font-mono small text-truncate" id="delete-modal-item-title" style="background-color: var(--bg-surface-subtle); border: 1px solid var(--border-color);"></div>
+            <p class="text-muted small mt-2 mb-0">This action cannot be undone and will remove the record from persistence.</p>
+          </div>
+          <div class="modal-footer" style="border-top: 1px solid var(--border-color);">
+            <button type="button" class="btn btn-sm btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" id="btn-confirm-delete" class="btn btn-sm btn-danger">
+              <i class="bi bi-trash me-1"></i> Delete Session
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/config.js"></script>
+    <script src="/assets/js/api.js"></script>
+    <script src="/assets/js/auth.js"></script>
+    <script src="/assets/js/ui.js"></script>
+    <script src="/assets/js/history.js"></script>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        HistoryManager.init();
+      });
+    </script>
+  </body>
+</html>

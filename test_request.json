@@ -1,0 +1,4 @@
+{
+  "language": "python",
+  "code": "def find_duplicates(arr):\n    dup = []\n    for i in range(len(arr)):\n        for j in range(i+1, len(arr)):\n            if arr[i] == arr[j] and arr[i] not in dup:\n                dup.append(arr[i])\n    return dup"
+}

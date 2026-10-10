@@ -1,0 +1,6 @@
+{
+  "name": "AI Coding Assistant",
+  "description": "A developer workspace and academic final-semester project for generating, explaining, debugging, and improving code using AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
