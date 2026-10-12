@@ -40,7 +40,7 @@
 .brand-logo-icon {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, #4f46e5 0%, #06b6d4 100%);
+  background: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
   color: #ffffff;
   border-radius: var(--radius-sm);
   display: flex;
@@ -712,8 +712,8 @@
 }
 
 .quick-action-icon.generate {
-  background-color: rgba(99, 102, 241, 0.12);
-  color: #6366f1;
+  background-color: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
 }
 
 .quick-action-icon.explain {
