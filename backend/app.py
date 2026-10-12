@@ -8,54 +8,181 @@ import time
 from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-# Enable Cross-Origin Resource Sharing (CORS) for local frontend communication
+
+# Database Configuration
+basedir = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', f'sqlite:///{os.path.join(basedir, "app.db")}')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+db = SQLAlchemy(app)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # ==============================================================================
-# In-Memory Database Store (For viva demonstration & testing)
+# Database Models
 # ==============================================================================
-USERS_DB = {
-    "alex.chen@university.edu": {
-        "id": "usr_001",
-        "name": "Alex Chen",
-        "email": "alex.chen@university.edu",
-        "password": "SeniorProject2026!",
-        "role": "Computer Science Senior",
-        "semester": "Semester 8",
-        "project": "AI Coding Assistant"
-    }
-}
+class User(db.Model):
+    __tablename__ = 'users'
+    
+    id = db.Column(db.String(50), primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    password_hash = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(100), nullable=False)
+    role = db.Column(db.String(100), default='Student Developer')
+    semester = db.Column(db.String(50), default='Semester 8')
+    project = db.Column(db.String(100), default='AI Coding Assistant')
+    avatar = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    conversations = db.relationship('Conversation', backref='user', lazy=True, cascade='all, delete-orphan')
+    
+    def set_password(self, password):
+        self.password_hash = generate_password_hash(password)
+    
+    def check_password(self, password):
+        return check_password_hash(self.password_hash, password)
+    
+    def to_dict(self, include_password=False):
+        data = {
+            'id': self.id,
+            'email': self.email,
+            'name': self.name,
+            'role': self.role,
+            'semester': self.semester,
+            'project': self.project,
+            'avatar': self.avatar,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+        if include_password:
+            data['password_hash'] = self.password_hash
+        return data
 
-CONVERSATIONS_DB = [
-    {
-        "id": "conv_101",
-        "title": "Binary Search Tree Implementation with In-Order Traversal",
-        "task": "generate",
-        "language": "python",
-        "instruction": "Implement a complete Binary Search Tree in Python with insert and in-order traversal.",
-        "code": "class Node:\n    def __init__(self, key):\n        self.left = None\n        self.right = None\n        self.val = key\n\ndef insert(root, key):\n    if root is None:\n        return Node(key)\n    if key < root.val:\n        root.left = insert(root.left, key)\n    else:\n        root.right = insert(root.right, key)\n    return root",
-        "created_at": datetime.now().isoformat()
-    },
-    {
-        "id": "conv_102",
-        "title": "Debugging TypeError: unsupported operand in matrix multiplication",
-        "task": "debug",
-        "language": "python",
-        "instruction": "Fix dimension mismatch during 2D matrix multiplication.",
-        "code": "def multiply(A, B):\n    return [[sum(a*b for a,b in zip(X_row, Y_col)) for Y_col in zip(*B)] for X_row in A]",
-        "created_at": datetime.now().isoformat()
-    }
-]
 
-SETTINGS_DB = {
-    "api_base_url": "http://localhost:5000/api",
-    "theme": "dark",
-    "mock_mode": False
-}
+class Conversation(db.Model):
+    __tablename__ = 'conversations'
+    
+    id = db.Column(db.String(50), primary_key=True)
+    user_id = db.Column(db.String(50), db.ForeignKey('users.id'), nullable=False, index=True)
+    title = db.Column(db.String(200), nullable=False)
+    task = db.Column(db.String(50), nullable=False)
+    language = db.Column(db.String(50), nullable=False)
+    instruction = db.Column(db.Text, nullable=True)
+    code = db.Column(db.Text, nullable=True)
+    response = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'title': self.title,
+            'task': self.task,
+            'language': self.language,
+            'instruction': self.instruction,
+            'code': self.code,
+            'response': self.response,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
 
-TOTAL_REQUESTS_COUNTER = 52
+
+class Settings(db.Model):
+    __tablename__ = 'settings'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    key = db.Column(db.String(100), unique=True, nullable=False)
+    value = db.Column(db.Text, nullable=True)
+    
+    def to_dict(self):
+        return {self.key: self.value}
+
+
+class RequestCounter(db.Model):
+    __tablename__ = 'request_counters'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    count = db.Column(db.Integer, default=0)
+    
+    @staticmethod
+    def get_count():
+        counter = RequestCounter.query.first()
+        return counter.count if counter else 0
+    
+    @staticmethod
+    def increment():
+        counter = RequestCounter.query.first()
+        if not counter:
+            counter = RequestCounter(count=0)
+            db.session.add(counter)
+        counter.count += 1
+        db.session.commit()
+        return counter.count
+
+
+# ==============================================================================
+# Initialize Database & Seed Data
+# ==============================================================================
+def init_db():
+    with app.app_context():
+        db.create_all()
+        
+        # Seed default user if none exists
+        if not User.query.first():
+            demo_user = User(
+                id='usr_001',
+                email='alex.chen@university.edu',
+                name='Alex Chen',
+                role='Computer Science Senior',
+                semester='Semester 8',
+                project='AI Coding Assistant'
+            )
+            demo_user.set_password('SeniorProject2026!')
+            db.session.add(demo_user)
+            
+            # Seed conversations
+            conv1 = Conversation(
+                id='conv_101',
+                user_id='usr_001',
+                title='Binary Search Tree Implementation with In-Order Traversal',
+                task='generate',
+                language='python',
+                instruction='Implement a complete Binary Search Tree in Python with insert and in-order traversal.',
+                code='class Node:\n    def __init__(self, key):\n        self.left = None\n        self.right = None\n        self.val = key\n\ndef insert(root, key):\n    if root is None:\n        return Node(key)\n    if key < root.val:\n        root.left = insert(root.left, key)\n    else:\n        root.right = insert(root.right, key)\n    return root',
+                created_at=datetime.utcnow()
+            )
+            
+            conv2 = Conversation(
+                id='conv_102',
+                user_id='usr_001',
+                title='Debugging TypeError: unsupported operand in matrix multiplication',
+                task='debug',
+                language='python',
+                instruction='Fix dimension mismatch during 2D matrix multiplication.',
+                code='def multiply(A, B):\n    return [[sum(a*b for a,b in zip(X_row, Y_col)) for Y_col in zip(*B)] for X_row in A]',
+                created_at=datetime.utcnow()
+            )
+            
+            db.session.add(conv1)
+            db.session.add(conv2)
+            
+            # Seed settings
+            settings = [
+                Settings(key='api_base_url', value='http://localhost:5000/api'),
+                Settings(key='theme', value='dark'),
+                Settings(key='mock_mode', value='false'),
+            ]
+            db.session.add_all(settings)
+            
+            # Seed counter
+            counter = RequestCounter(count=52)
+            db.session.add(counter)
+            
+            db.session.commit()
+            print("Database initialized with seed data")
+
 
 # ==============================================================================
 # 1. Authentication REST APIs
@@ -63,99 +190,90 @@ TOTAL_REQUESTS_COUNTER = 52
 @app.route('/api/auth/register', methods=['POST'])
 def register():
     data = request.get_json() or {}
-    email = data.get('email', '').strip()
+    email = data.get('email', '').strip().lower()
     password = data.get('password', '')
     name = data.get('name', 'Developer')
-
+    
     if not email or not password:
         return jsonify({"error": "Email and password are required."}), 400
-
-    if email in USERS_DB:
+    
+    if User.query.filter_by(email=email).first():
         return jsonify({"error": "User with this email already exists."}), 400
-
-    new_user = {
-        "id": f"usr_{int(time.time())}",
-        "name": name,
-        "email": email,
-        "password": password,
-        "role": "Student Developer",
-        "semester": "Semester 8",
-        "project": "AI Coding Assistant"
-    }
-    USERS_DB[email] = new_user
-
+    
+    new_user = User(
+        id=f"usr_{int(time.time())}",
+        email=email,
+        name=name,
+        role='Student Developer',
+        semester='Semester 8',
+        project='AI Coding Assistant'
+    )
+    new_user.set_password(password)
+    
+    db.session.add(new_user)
+    db.session.commit()
+    
     return jsonify({
         "success": True,
         "message": "Registration successful. You may now sign in.",
         "user": {
-            "id": new_user["id"],
-            "name": new_user["name"],
-            "email": new_user["email"],
-            "role": new_user["role"]
+            "id": new_user.id,
+            "name": new_user.name,
+            "email": new_user.email,
+            "role": new_user.role
         }
     }), 201
+
 
 @app.route('/api/auth/login', methods=['POST'])
 def login():
     data = request.get_json() or {}
-    email = data.get('email', '').strip()
+    email = data.get('email', '').strip().lower()
     password = data.get('password', '')
-
+    
     if not email or not password:
         return jsonify({"error": "Email and password are required."}), 400
-
-    user = USERS_DB.get(email)
-    if not user or user["password"] != password:
+    
+    user = User.query.filter_by(email=email).first()
+    if not user or not user.check_password(password):
         return jsonify({"error": "Invalid email or password."}), 401
-
-    token = f"jwt_mock_token_{user['id']}_{int(time.time())}"
+    
+    token = f"jwt_mock_token_{user.id}_{int(time.time())}"
     return jsonify({
         "success": True,
         "token": token,
-        "user": {
-            "id": user["id"],
-            "name": user["name"],
-            "email": user["email"],
-            "role": user["role"],
-            "semester": user.get("semester"),
-            "project": user.get("project")
-        }
+        "user": user.to_dict()
     }), 200
+
 
 @app.route('/api/auth/logout', methods=['POST'])
 def logout():
     return jsonify({"success": True, "message": "Logged out successfully."}), 200
 
+
 @app.route('/api/auth/me', methods=['GET'])
 def get_current_user():
-    # Return active demo user
-    user = list(USERS_DB.values())[0]
+    user = User.query.first()
+    if not user:
+        return jsonify({"error": "No user found"}), 404
     return jsonify({
         "success": True,
-        "user": {
-            "id": user["id"],
-            "name": user["name"],
-            "email": user["email"],
-            "role": user["role"],
-            "semester": user.get("semester"),
-            "project": user.get("project")
-        }
+        "user": user.to_dict()
     }), 200
+
 
 # ==============================================================================
 # 2. AI Coding Task Endpoints
 # ==============================================================================
 @app.route('/api/ai/generate', methods=['POST'])
 def generate_code():
-    global TOTAL_REQUESTS_COUNTER
-    TOTAL_REQUESTS_COUNTER += 1
-
+    RequestCounter.increment()
+    
     data = request.get_json() or {}
     language = data.get('language', 'python').lower()
     instruction = data.get('instruction', 'Generate solution')
     complexity = data.get('complexity', 'Intermediate')
-
-    # Synthesize clean, structured response conforming strictly to contract
+    
     sample_code = f"""# ==============================================================
 # AI Coding Assistant - Generated Program
 # Task: {instruction}
@@ -179,7 +297,7 @@ if __name__ == '__main__':
     sample = [42, 17, 89, 5, 23]
     print(f"Result: {{execute_task(sample)}}")
 """
-
+    
     return jsonify({
         "success": True,
         "task": "generate",
@@ -197,18 +315,18 @@ This program fulfills **"{instruction}"** in **{language.upper()}** using clean,
         "sample_output": "[5, 17, 23, 42, 89]"
     }), 200
 
+
 @app.route('/api/ai/explain', methods=['POST'])
 def explain_code():
-    global TOTAL_REQUESTS_COUNTER
-    TOTAL_REQUESTS_COUNTER += 1
-
+    RequestCounter.increment()
+    
     data = request.get_json() or {}
     language = data.get('language', 'python')
     code = data.get('code', '')
-
+    
     if not code:
         return jsonify({"error": "Source code is required for explanation."}), 400
-
+    
     return jsonify({
         "success": True,
         "task": "explain",
@@ -229,19 +347,19 @@ def explain_code():
         "space_complexity": "O(1) auxiliary space executed in-place."
     }), 200
 
+
 @app.route('/api/ai/debug', methods=['POST'])
 def debug_code():
-    global TOTAL_REQUESTS_COUNTER
-    TOTAL_REQUESTS_COUNTER += 1
-
+    RequestCounter.increment()
+    
     data = request.get_json() or {}
     language = data.get('language', 'python')
     code = data.get('code', '')
     error_message = data.get('error_message', '')
-
+    
     if not code:
         return jsonify({"error": "Source code is required for debugging."}), 400
-
+    
     corrected = f"""# Verified & Corrected Version
 # Fix applied: Boundary validation & error handling
 {code}
@@ -257,18 +375,18 @@ def debug_code():
         "fix_explanation": "Adding proper bounds validation prevents runtime IndexErrors and memory faults."
     }), 200
 
+
 @app.route('/api/ai/improve', methods=['POST'])
 def improve_code():
-    global TOTAL_REQUESTS_COUNTER
-    TOTAL_REQUESTS_COUNTER += 1
-
+    RequestCounter.increment()
+    
     data = request.get_json() or {}
     language = data.get('language', 'python')
     code = data.get('code', '')
-
+    
     if not code:
         return jsonify({"error": "Source code is required for improvement."}), 400
-
+    
     improved = f"""# Refactored for Clean Code & Performance
 {code}
 """
@@ -287,57 +405,79 @@ def improve_code():
         ]
     }), 200
 
+
 # ==============================================================================
 # 3. Conversation History Endpoints
 # ==============================================================================
 @app.route('/api/conversations', methods=['GET'])
 def get_conversations():
+    user = User.query.first()
+    if not user:
+        return jsonify({"success": True, "conversations": []}), 200
+    
+    conversations = Conversation.query.filter_by(user_id=user.id).order_by(Conversation.created_at.desc()).all()
     return jsonify({
         "success": True,
-        "conversations": CONVERSATIONS_DB
+        "conversations": [c.to_dict() for c in conversations]
     }), 200
+
 
 @app.route('/api/conversations', methods=['POST'])
 def create_conversation():
+    user = User.query.first()
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+    
     data = request.get_json() or {}
-    new_entry = {
-        "id": f"conv_{int(time.time() * 1000)}",
-        "title": data.get("title") or (data.get("instruction", "Untitled Task")[:45] + "..."),
-        "task": data.get("task", "generate"),
-        "language": data.get("language", "python"),
-        "instruction": data.get("instruction", ""),
-        "code": data.get("code", ""),
-        "response": data.get("response"),
-        "created_at": datetime.now().isoformat()
-    }
-    CONVERSATIONS_DB.insert(0, new_entry)
-    return jsonify({"success": True, "conversation": new_entry}), 201
+    new_entry = Conversation(
+        id=f"conv_{int(time.time() * 1000)}",
+        user_id=user.id,
+        title=data.get("title") or (data.get("instruction", "Untitled Task")[:45] + "..."),
+        task=data.get("task", "generate"),
+        language=data.get("language", "python"),
+        instruction=data.get("instruction", ""),
+        code=data.get("code", ""),
+        response=data.get("response"),
+        created_at=datetime.utcnow()
+    )
+    db.session.add(new_entry)
+    db.session.commit()
+    
+    return jsonify({"success": True, "conversation": new_entry.to_dict()}), 201
+
 
 @app.route('/api/conversations/<conv_id>', methods=['GET'])
 def get_conversation(conv_id):
-    for c in CONVERSATIONS_DB:
-        if c["id"] == conv_id:
-            return jsonify({"success": True, "conversation": c}), 200
-    return jsonify({"error": "Conversation not found."}), 404
+    conv = Conversation.query.get(conv_id)
+    if not conv:
+        return jsonify({"error": "Conversation not found."}), 404
+    return jsonify({"success": True, "conversation": conv.to_dict()}), 200
+
 
 @app.route('/api/conversations/<conv_id>', methods=['DELETE'])
 def delete_conversation(conv_id):
-    global CONVERSATIONS_DB
-    before_len = len(CONVERSATIONS_DB)
-    CONVERSATIONS_DB = [c for c in CONVERSATIONS_DB if c["id"] != conv_id]
-    if len(CONVERSATIONS_DB) < before_len:
-        return jsonify({"success": True, "message": "Conversation deleted."}), 200
-    return jsonify({"error": "Conversation not found."}), 404
+    conv = Conversation.query.get(conv_id)
+    if not conv:
+        return jsonify({"error": "Conversation not found."}), 404
+    
+    db.session.delete(conv)
+    db.session.commit()
+    return jsonify({"success": True, "message": "Conversation deleted."}), 200
+
 
 # ==============================================================================
 # 4. Dashboard Stats & System Settings
 # ==============================================================================
 @app.route('/api/dashboard/stats', methods=['GET'])
 def get_dashboard_stats():
+    user = User.query.first()
+    conv_count = Conversation.query.filter_by(user_id=user.id).count() if user else 0
+    total_requests = RequestCounter.get_count()
+    
     return jsonify({
         "success": True,
-        "total_requests": TOTAL_REQUESTS_COUNTER,
-        "saved_conversations": len(CONVERSATIONS_DB),
+        "total_requests": total_requests,
+        "saved_conversations": conv_count,
         "supported_languages_count": 6,
         "avg_response_time": "1.2s",
         "top_tasks": [
@@ -348,20 +488,38 @@ def get_dashboard_stats():
         ]
     }), 200
 
+
 @app.route('/api/settings', methods=['GET'])
 def get_settings():
-    return jsonify({"success": True, "settings": SETTINGS_DB}), 200
+    settings = Settings.query.all()
+    settings_dict = {s.key: s.value for s in settings}
+    return jsonify({"success": True, "settings": settings_dict}), 200
+
 
 @app.route('/api/settings', methods=['PUT'])
 def update_settings():
     data = request.get_json() or {}
-    SETTINGS_DB.update(data)
-    return jsonify({"success": True, "settings": SETTINGS_DB}), 200
+    
+    for key, value in data.items():
+        setting = Settings.query.filter_by(key=key).first()
+        if setting:
+            setting.value = str(value)
+        else:
+            setting = Settings(key=key, value=str(value))
+            db.session.add(setting)
+    
+    db.session.commit()
+    
+    settings = Settings.query.all()
+    settings_dict = {s.key: s.value for s in settings}
+    return jsonify({"success": True, "settings": settings_dict}), 200
+
 
 # ==============================================================================
 # Main Server Runner
 # ==============================================================================
 if __name__ == '__main__':
+    init_db()
     port = int(os.environ.get('PORT', 5000))
     print(f"AI Coding Assistant Flask REST Backend starting on http://127.0.0.1:{port}")
     app.run(host='0.0.0.0', port=port, debug=True)
