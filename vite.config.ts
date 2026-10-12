@@ -25,6 +25,7 @@ export default defineConfig(() => {
           improver: path.resolve(__dirname, 'improver.html'),
           history: path.resolve(__dirname, 'history.html'),
           settings: path.resolve(__dirname, 'settings.html'),
+          'reset-password': path.resolve(__dirname, 'reset-password.html'),
         },
       },
     },

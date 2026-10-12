@@ -5,7 +5,11 @@ Academic Final-Semester College Project
 
 import os
 import time
-from datetime import datetime
+import smtplib
+import secrets
+from datetime import datetime, timedelta
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -120,6 +124,28 @@ class RequestCounter(db.Model):
         counter.count += 1
         db.session.commit()
         return counter.count
+
+
+class PasswordResetToken(db.Model):
+    __tablename__ = 'password_reset_tokens'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.String(50), db.ForeignKey('users.id'), nullable=False)
+    token = db.Column(db.String(255), unique=True, nullable=False, index=True)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    used = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    @staticmethod
+    def is_token_valid(token_str):
+        token_record = PasswordResetToken.query.filter_by(token=token_str).first()
+        if not token_record:
+            return None
+        if token_record.used:
+            return None
+        if datetime.utcnow() > token_record.expires_at:
+            return None
+        return token_record
 
 
 # ==============================================================================
@@ -249,6 +275,137 @@ def login():
 @app.route('/api/auth/logout', methods=['POST'])
 def logout():
     return jsonify({"success": True, "message": "Logged out successfully."}), 200
+
+
+# ==============================================================================
+# Email Sending Helper
+# ==============================================================================
+def send_password_reset_email(to_email, reset_token, base_url='http://localhost:3000'):
+    """Send password reset email with token link."""
+    smtp_user = os.environ.get('SMTP_USER')
+    smtp_pass = os.environ.get('SMTP_PASS')
+    
+    if not smtp_user or not smtp_pass:
+        # Return token directly for demo/testing purposes
+        return False, reset_token
+    
+    msg = MIMEMultipart()
+    msg['From'] = smtp_user
+    msg['To'] = to_email
+    msg['Subject'] = 'AI Coding Assistant - Password Reset'
+    
+    reset_link = f"{base_url}/reset-password.html?token={reset_token}"
+    
+    html_body = f"""
+    <html>
+        <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+            <h2 style="color: #3b82f6;">Password Reset Request</h2>
+            <p>You requested a password reset for your AI Coding Assistant account.</p>
+            <p>Your email: <strong>{to_email}</strong></p>
+            <p>Click the button below to reset your password:</p>
+            <a href="{reset_link}" 
+               style="display: inline-block; background: #3b82f6; color: white; padding: 12px 24px; 
+                      text-decoration: none; border-radius: 6px; margin: 10px 0;">
+                Reset Password
+            </a>
+            <p style="color: #666; font-size: 14px;">
+                This link expires in 30 minutes. If you didn't request this, 
+                simply ignore this email.
+            </p>
+        </body>
+    </html>
+    """
+    msg.attach(MIMEText(html_body, 'html'))
+    
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(smtp_user, smtp_pass)
+        server.send_message(msg)
+        server.quit()
+        return True, None
+    except Exception as e:
+        print(f"Email send failed: {e}")
+        return False, reset_token
+
+
+@app.route('/api/auth/forgot-password', methods=['POST'])
+def forgot_password():
+    """Endpoint to request password reset - sends email with token."""
+    data = request.get_json() or {}
+    email = data.get('email', '').strip().lower()
+    
+    if not email:
+        return jsonify({"error": "Email is required."}), 400
+    
+    user = User.query.filter_by(email=email).first()
+    if not user:
+        # Return same response to prevent email enumeration
+        return jsonify({
+            "success": True,
+            "message": "If that email is registered, a reset link has been sent."
+        }), 200
+    
+    # Generate token
+    reset_token = secrets.token_urlsafe(32)
+    expires_at = datetime.utcnow() + timedelta(minutes=30)
+    
+    # Save token
+    token_record = PasswordResetToken(
+        user_id=user.id,
+        token=reset_token,
+        expires_at=expires_at
+    )
+    db.session.add(token_record)
+    db.session.commit()
+    
+    # Send email
+    base_url = data.get('base_url', 'http://localhost:3000')
+    email_sent, fallback_token = send_password_reset_email(email, reset_token, base_url)
+    
+    response = {
+        "success": True,
+        "message": "If that email is registered, a reset link has been sent."
+    }
+    
+    # For demo/testing, include the token if email wasn't sent
+    if not email_sent:
+        response["demo_token"] = fallback_token
+        response["message"] = "Reset token generated (email not configured - demo mode)."
+    
+    return jsonify(response), 200
+
+
+@app.route('/api/auth/reset-password', methods=['POST'])
+def reset_password():
+    """Endpoint to reset password using token."""
+    data = request.get_json() or {}
+    token = data.get('token', '').strip()
+    new_password = data.get('new_password', '')
+    
+    if not token or not new_password:
+        return jsonify({"error": "Token and new password are required."}), 400
+    
+    if len(new_password) < 6:
+        return jsonify({"error": "Password must be at least 6 characters."}), 400
+    
+    token_record = PasswordResetToken.is_token_valid(token)
+    if not token_record:
+        return jsonify({"error": "Invalid or expired reset token."}), 401
+    
+    # Update password
+    user = User.query.get(token_record.user_id)
+    if not user:
+        return jsonify({"error": "User not found."}), 404
+    
+    user.set_password(new_password)
+    token_record.used = True
+    db.session.commit()
+    
+    return jsonify({
+        "success": True,
+        "message": "Password has been reset successfully. You can now log in with your new password."
+    }), 200
 
 
 @app.route('/api/auth/me', methods=['GET'])
