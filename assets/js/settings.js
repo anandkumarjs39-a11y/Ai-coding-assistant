@@ -73,6 +73,25 @@ const Settings = {
       UI.showToast('Profile picture updated!', 'success');
     };
     reader.readAsDataURL(file);
+    
+    // Reset input so same file can be selected again
+    event.target.value = '';
+  },
+
+  resetAvatar() {
+    const user = Auth.getUser() || {};
+    delete user.avatar;
+    localStorage.setItem(Auth.USER_KEY, JSON.stringify(user));
+    
+    const avatarPreview = document.getElementById('profile-avatar-preview');
+    const settingsAvatar = document.getElementById('settings-profile-avatar');
+    const defaultAvatar = '/src/assets/images/avatar_student_dev_1791558006569.jpg';
+    
+    if (avatarPreview) avatarPreview.src = defaultAvatar;
+    if (settingsAvatar) settingsAvatar.src = defaultAvatar;
+    
+    UI.renderUserProfileSnippet();
+    UI.showToast('Profile picture removed', 'info');
   },
 
   populateSystemSettings() {
@@ -162,6 +181,14 @@ const Settings = {
     if (btnLogout) {
       btnLogout.addEventListener('click', async () => {
         await Auth.logout();
+      });
+    }
+
+    // Remove Avatar Button
+    const btnRemoveAvatar = document.getElementById('btn-remove-avatar');
+    if (btnRemoveAvatar) {
+      btnRemoveAvatar.addEventListener('click', () => {
+        this.resetAvatar();
       });
     }
   }
